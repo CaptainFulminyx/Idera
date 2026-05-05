@@ -29,7 +29,7 @@ const handleOAuthLogin = (provider) => {
 
 <template>
   <div class="min-h-screen bg-base flex items-center justify-center p-4">
-    <div class="max-w-md w-full bg-red-500 rounded-2xl shadow-xl overflow-hidden">
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden">
       <div class="p-8">
         <!-- Header -->
         <div class="text-center mb-8">
