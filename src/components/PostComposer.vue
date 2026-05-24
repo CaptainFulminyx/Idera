@@ -69,7 +69,7 @@ export default {
 .writeText {
   width: 100%;
   background-color: #2c2f3f;
-  border-radius: 28px;
+  border-radius: 15px;
   padding: 14px 20px;
   font-size: 1rem;
   line-height: 1.5;
