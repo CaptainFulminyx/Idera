@@ -37,7 +37,7 @@ export default {
       const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight);
       const paddingTop = parseFloat(getComputedStyle(textarea).paddingTop);
       const paddingBottom = parseFloat(getComputedStyle(textarea).paddingBottom);
-      const maxHeight = (lineHeight * 4) + paddingTop + paddingBottom;
+      const maxHeight = (lineHeight * 3) + paddingTop + paddingBottom;
       
       let newHeight = Math.min(textarea.scrollHeight, maxHeight);
       textarea.style.height = newHeight + 'px';
