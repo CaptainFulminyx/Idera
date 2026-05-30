@@ -9,7 +9,7 @@
         rows="1"
         @input="autoResize"
       ></textarea>
-      <div class="icon-wrapper">
+      <div class="icon-wrapper" @click="postContentFunc">
         <Icon
           icon="boxicons:send-filled"
           width="40px"
@@ -67,6 +67,10 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener("resize", autoResize);
 });
+
+function postContentFunc() {
+  alert("hi");
+}
 </script>
 
 <style scoped>
