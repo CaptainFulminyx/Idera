@@ -29,11 +29,12 @@ defineOptions({
   name: "SmartInputBar",
 });
 
-// Reactive state
-const text = ref("");
-const textareaRef = ref(null); // This name must exactly match the template ref string
+// 1. Define the event emitter
+const emit = defineEmits(["submit-post"]);
 
-// Resize logic
+const text = ref("");
+const textareaRef = ref(null);
+
 const autoResize = () => {
   const textarea = textareaRef.value;
   if (!textarea) return;
@@ -44,7 +45,6 @@ const autoResize = () => {
   const paddingBottom =
     parseFloat(getComputedStyle(textarea).paddingBottom) || 0;
 
-  // Caps growth at 4 lines
   const maxHeight = lineHeight * 4 + paddingTop + paddingBottom;
 
   let newHeight = Math.min(textarea.scrollHeight, maxHeight);
@@ -53,12 +53,10 @@ const autoResize = () => {
     textarea.scrollHeight > maxHeight ? "auto" : "hidden";
 };
 
-// Keep height in sync if text changes programmatically
 watch(text, () => {
   nextTick(autoResize);
 });
 
-// Lifecycle hooks
 onMounted(() => {
   autoResize();
   window.addEventListener("resize", autoResize);
@@ -68,8 +66,12 @@ onBeforeUnmount(() => {
   window.removeEventListener("resize", autoResize);
 });
 
+// 2. Emit the text content before wiping it
 function postContentFunc() {
-  alert("hi");
+  if (!text.value.trim()) return; // Don't post empty text
+
+  emit("submit-post", text.value);
+  text.value = "";
 }
 </script>
 
