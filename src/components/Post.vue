@@ -35,11 +35,12 @@ defineProps({
 
 <style scoped>
 .post-item {
-  border: 1px solid #e1e8ed;
-  border-radius: 8px;
+  border: 5px solid #f66;
+  border-radius: 20px;
+  border-top-left-radius: 0;
   padding: 16px;
   margin-bottom: 12px;
-  background: #fff;
+  background: #2c2f3f;
   font-family: sans-serif;
 }
 .post-header {
@@ -51,7 +52,7 @@ defineProps({
 .avatar {
   width: 40px;
   height: 40px;
-  background-color: #cbd5e1;
+  background-color: #f99;
   border-radius: 50%;
 }
 .meta {
@@ -60,14 +61,14 @@ defineProps({
 }
 .username {
   font-weight: bold;
-  color: #1e293b;
+  color: #fff;
 }
 .timestamp {
   font-size: 0.8rem;
-  color: #64748b;
+  color: rgb(175, 150, 150);
 }
 .post-body {
-  color: #334155;
+  color: rgb(255, 255, 255);
   line-height: 1.5;
   white-space: pre-wrap; /* Preserves line breaks from textarea */
 }
@@ -75,7 +76,7 @@ defineProps({
   display: flex;
   gap: 16px;
   margin-top: 12px;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid #fff;
   padding-top: 8px;
 }
 .action-btn {
