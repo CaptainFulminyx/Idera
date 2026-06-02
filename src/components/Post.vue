@@ -25,9 +25,11 @@ defineProps({
     </div>
 
     <div class="post-actions">
-      <button class="action-btn"><Icon icon="mdi:heart-outline" /> Like</button>
       <button class="action-btn">
-        <Icon icon="mdi:comment-outline" /> Comment
+        <Icon icon="boxicons:like" width="20px" height="20px" />
+      </button>
+      <button class="action-btn">
+        <Icon icon="material-symbols:redo-rounded" width="25px" height="25px" />
       </button>
     </div>
   </div>
@@ -38,6 +40,7 @@ defineProps({
   border: 5px solid #f66;
   border-radius: 20px;
   border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
   padding: 16px;
   margin-bottom: 12px;
   background: #2c2f3f;
@@ -76,7 +79,6 @@ defineProps({
   display: flex;
   gap: 16px;
   margin-top: 12px;
-  border-top: 1px solid #fff;
   padding-top: 8px;
 }
 .action-btn {

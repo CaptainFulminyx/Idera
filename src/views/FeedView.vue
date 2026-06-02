@@ -18,6 +18,7 @@ const handleNewPost = (postText) => {
   const newPost = {
     id: Date.now(), // Simple unique ID
     content: postText,
+    isMyPost: true,
     timestamp: new Date().toLocaleTimeString(),
   };
 
