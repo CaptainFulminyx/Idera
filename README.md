@@ -17,7 +17,6 @@ It does not matter if you write Python in Lagos, TypeScript in Jakarta, or Go in
 Most developer communities are either too noisy or too formal. You either get lost in a feed of marketing content, or you feel like you need a resume to participate.
 
 Idera is neither of those things.
-
 It is a quiet, focused space where developers can show up as they are, talk about real problems, and find people who get it.
 
 ---
