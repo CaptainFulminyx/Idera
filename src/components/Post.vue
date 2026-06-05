@@ -11,9 +11,10 @@ defineProps({
 </script>
 
 <template>
-  <div class="post-item"
-    
-    >
+  <div
+    class="post-item"
+    :style="{ borderColor: post?.isMyPost ? '#fff' : '#f66' }"
+  >
     <div class="post-header">
       <div class="avatar"></div>
       <div class="meta">
