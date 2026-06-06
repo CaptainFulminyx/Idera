@@ -1,5 +1,8 @@
 <template>
-  <div class="writeTextContainer">
+  <div 
+    class="writeTextContainer" 
+    :style="{ bottom: `${keyboardOffset}px` }"
+  >
     <div class="input-bar">
       <textarea
         ref="textareaRef"
@@ -29,11 +32,12 @@ defineOptions({
   name: "SmartInputBar",
 });
 
-// 1. Define the event emitter
 const emit = defineEmits(["submit-post"]);
-
 const text = ref("");
 const textareaRef = ref(null);
+
+// Tracks the keyboard height/offset
+const keyboardOffset = ref(0);
 
 const autoResize = () => {
   const textarea = textareaRef.value;
@@ -42,15 +46,24 @@ const autoResize = () => {
   textarea.style.height = "auto";
   const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight) || 24;
   const paddingTop = parseFloat(getComputedStyle(textarea).paddingTop) || 0;
-  const paddingBottom =
-    parseFloat(getComputedStyle(textarea).paddingBottom) || 0;
+  const paddingBottom = parseFloat(getComputedStyle(textarea).paddingBottom) || 0;
 
   const maxHeight = lineHeight * 4 + paddingTop + paddingBottom;
 
   let newHeight = Math.min(textarea.scrollHeight, maxHeight);
   textarea.style.height = `${newHeight}px`;
-  textarea.style.overflowY =
-    textarea.scrollHeight > maxHeight ? "auto" : "hidden";
+  textarea.style.overflowY = textarea.scrollHeight > maxHeight ? "auto" : "hidden";
+};
+
+// Handler to update the layout when the virtual viewport changes (i.e. keyboard pops up)
+const handleViewportChange = () => {
+  if (!window.visualViewport) return;
+
+  // Calculate the hidden space at the bottom of the screen
+  const offset = window.innerHeight - window.visualViewport.height;
+  
+  // Ensure we don't apply negative offsets
+  keyboardOffset.value = Math.max(0, offset);
 };
 
 watch(text, () => {
@@ -60,16 +73,25 @@ watch(text, () => {
 onMounted(() => {
   autoResize();
   window.addEventListener("resize", autoResize);
+
+  // Listen to the visual viewport resize and scroll events
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", handleViewportChange);
+    window.visualViewport.addEventListener("scroll", handleViewportChange);
+  }
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", autoResize);
+
+  if (window.visualViewport) {
+    window.visualViewport.removeEventListener("resize", handleViewportChange);
+    window.visualViewport.removeEventListener("scroll", handleViewportChange);
+  }
 });
 
-// 2. Emit the text content before wiping it
 function postContentFunc() {
-  if (!text.value.trim()) return; // Don't post empty text
-
+  if (!text.value.trim()) return;
   emit("submit-post", text.value);
   text.value = "";
 }
@@ -79,25 +101,28 @@ function postContentFunc() {
 .writeTextContainer {
   width: 100%;
   position: fixed;
-  bottom: 0;
+  /* 'bottom' is now controlled dynamically via :style */
   left: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px 20px 24px 20px;
   box-sizing: border-box;
+  /* Smooth out the transition slightly for moving devices */
+  transition: bottom 0.1s ease-out; 
+  z-index: 1000; 
 }
 
 .input-bar {
   width: 100%;
-  max-width: 800px; /* Optional: keeps the bar from getting awkwardly wide on desktop */
+  max-width: 800px;
   background-color: #2c2f3f;
   border-radius: 15px;
   padding: 8px 12px;
   box-sizing: border-box;
   outline: 4px solid #f66;
   display: flex;
-  align-items: flex-end; /* Aligns the icon to the bottom as the textarea expands */
+  align-items: flex-end;
   gap: 8px;
 }
 
@@ -114,7 +139,6 @@ function postContentFunc() {
   padding: 8px 4px;
   margin: 0;
   box-sizing: border-box;
-  /* Removed hardcoded overflow-y and max-height so JS logic can handle it */
   word-break: break-word;
   white-space: pre-wrap;
 }
@@ -125,7 +149,6 @@ function postContentFunc() {
   justify-content: center;
   flex-shrink: 0;
   cursor: pointer;
-  /* Fine-tuning icon position to align cleanly with the text line */
   margin-bottom: 2px;
 }
 

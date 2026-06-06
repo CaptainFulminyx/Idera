@@ -13,10 +13,19 @@ defineProps({
 <template>
   <div
     class="post-item"
-    :style="{ borderColor: post?.isMyPost ? '#fff' : '#f66' }"
+    :style="{
+      borderColor: post?.isMyPost ? '#fff' : '#f66',
+      borderTopLeftRadius: post?.isMyPost ? '20px' : '0px',
+      borderTopRightRadius: post?.isMyPost ? '0px' : '20px',
+    }"
   >
-    <div class="post-header">
-      <div class="avatar"></div>
+    <div
+      class="post-header"
+      :style="{
+        background: post?.isMyPost ? '#fff' : '#f66',
+      }"
+    >
+      <div class="pfp"></div>
       <div class="meta">
         <span class="username">Anonymous User</span>
         <span class="timestamp">{{ post.timestamp }}</span>
@@ -42,9 +51,7 @@ defineProps({
 .post-item {
   border: 5px solid #f66;
   border-radius: 20px;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  padding: 16px;
+
   margin-bottom: 12px;
   background: #2c2f3f;
   font-family: sans-serif;
@@ -54,11 +61,13 @@ defineProps({
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
+  background: #f66;
+  padding: 10px;
 }
-.avatar {
+.pfp {
   width: 40px;
   height: 40px;
-  background-color: #f99;
+  background-color: #fff;
   border-radius: 50%;
 }
 .meta {
@@ -71,18 +80,20 @@ defineProps({
 }
 .timestamp {
   font-size: 0.8rem;
-  color: rgb(175, 150, 150);
+  color: #333;
 }
 .post-body {
   color: rgb(255, 255, 255);
   line-height: 1.5;
   white-space: pre-wrap; /* Preserves line breaks from textarea */
+  padding-left: 10px;
+  padding-right: 10px;
 }
 .post-actions {
   display: flex;
   gap: 16px;
-  margin-top: 12px;
-  padding-top: 8px;
+
+  padding: 10px;
 }
 .action-btn {
   background: none;

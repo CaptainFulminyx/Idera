@@ -43,6 +43,7 @@ const handleNewPost = (postText) => {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
+  margin-bottom: 200px;
 }
 .feed-posts {
   margin-top: 20px;
