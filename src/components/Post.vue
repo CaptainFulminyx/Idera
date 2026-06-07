@@ -111,6 +111,6 @@ defineProps({
   color: #64748b;
 }
 .action-btn:hover {
-  color: #3b82f6;
+  color: #fff;
 }
 </style>
