@@ -1,7 +1,6 @@
 <script setup>
 import { Icon } from "@iconify/vue";
 
-// Accept the post object as a prop
 defineProps({
   post: {
     type: Object,
@@ -11,20 +10,8 @@ defineProps({
 </script>
 
 <template>
-  <div
-    class="post-item"
-    :style="{
-      borderColor: post?.isMyPost ? '#fff' : '#f66',
-      borderTopLeftRadius: post?.isMyPost ? '20px' : '0px',
-      borderTopRightRadius: post?.isMyPost ? '0px' : '20px',
-    }"
-  >
-    <div
-      class="post-header"
-      :style="{
-        background: post?.isMyPost ? '#fff' : '#f66',
-      }"
-    >
+  <div :class="post.isMyPost ? 'myPost-item' : 'post-item'">
+    <div class="post-header">
       <div class="pfp"></div>
       <div class="meta">
         <span class="username">Anonymous User</span>
@@ -48,20 +35,39 @@ defineProps({
 </template>
 
 <style scoped>
-.post-item {
-  border: 5px solid #f66;
+/* Shared base */
+.post-item,
+.myPost-item {
   border-radius: 20px;
-
   margin-bottom: 12px;
   background: #2c2f3f;
   font-family: sans-serif;
+  overflow: hidden;
 }
+
+/* Default: red accent */
+.post-item {
+  border: 5px solid #f66;
+  border-top-left-radius: 0px;
+}
+.post-item .post-header {
+  background: #f66;
+}
+
+/* My post: white accent */
+.myPost-item {
+  border: 5px solid #fff;
+  border-top-right-radius: 0;
+}
+.myPost-item .post-header {
+  background: #fff;
+}
+
 .post-header {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
-  background: #f66;
   padding: 10px;
 }
 .pfp {
@@ -69,6 +75,7 @@ defineProps({
   height: 40px;
   background-color: #fff;
   border-radius: 50%;
+  border: 2px solid #f66;
 }
 .meta {
   display: flex;
@@ -85,14 +92,13 @@ defineProps({
 .post-body {
   color: rgb(255, 255, 255);
   line-height: 1.5;
-  white-space: pre-wrap; /* Preserves line breaks from textarea */
+  white-space: pre-wrap;
   padding-left: 10px;
   padding-right: 10px;
 }
 .post-actions {
   display: flex;
   gap: 16px;
-
   padding: 10px;
 }
 .action-btn {
