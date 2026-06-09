@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from "vue";
 import { Icon } from "@iconify/vue";
 import { useSwipeReply } from "@/lib/useSwipe";
 
@@ -20,69 +21,113 @@ const {
   onPointerMove,
   onPointerUp,
 } = useSwipeReply(60, () => emit("reply", props.post));
+
+// Calculate a dynamic scale from 0.6 up to 1.3 based on the swipe progress
+const replyIconScale = computed(() => {
+  const baseScale = 0.6;
+  const maxScale = 1.3;
+  // Progress goes from 0 to 1 as it hits threshold
+  const progress = Math.min(translateX.value / 60, 1);
+
+  if (reachedThreshold.value) {
+    return maxScale; // Lock at max scale or add a slight extra pop if threshold is hit
+  }
+  return baseScale + progress * (1.0 - baseScale);
+});
 </script>
 
 <template>
-  <div
-    :class="[
-      isSwiping ? 'is-swiping' : '',
-      post.isMyPost ? 'myPost-item' : 'post-item',
-    ]"
-    class="post-container swipe-content"
-    :style="{ transform: `translateX(${translateX}px)` }"
-    @touchstart.passive="onPointerDown"
-    @touchmove.passive="onPointerMove"
-    @touchend="onPointerUp"
-    @mousedown="onPointerDown"
-    @mousemove="onPointerMove"
-    @mouseup="onPointerUp"
-    @mouseleave="onPointerUp"
-  >
-    <!-- Reply icon sits behind, revealed by swipe -->
+  <div class="swipe-wrapper">
     <div
       class="reply-hint"
-      :style="{ opacity: replyIconOpacity }"
+      :style="{
+        opacity: replyIconOpacity,
+        transform: `translateY(-50%) scale(${replyIconScale})`,
+      }"
       :class="{ 'reply-hint--active': reachedThreshold }"
     >
-      <Icon icon="mdi:reply" width="22px" height="22px" color="#f66" />
+      <Icon
+        icon="material-symbols:redo-rounded"
+        width="40px"
+        height="40px"
+        color="#f66"
+      />
     </div>
 
-    <!-- Swipeable entire post -->
-    <div>
-      <div class="post-header">
-        <div class="pfp"></div>
-        <div class="meta">
-          <span class="username">Anonymous User</span>
-          <span class="timestamp">{{ post.timestamp }}</span>
+    <div
+      :class="[
+        isSwiping ? 'is-swiping' : '',
+        post.isMyPost ? 'myPost-item' : 'post-item',
+      ]"
+      class="post-container swipe-content"
+      :style="{ transform: `translateX(${translateX}px)` }"
+      @touchstart.passive="onPointerDown"
+      @touchmove.passive="onPointerMove"
+      @touchend="onPointerUp"
+      @mousedown="onPointerDown"
+      @mousemove="onPointerMove"
+      @mouseup="onPointerUp"
+      @mouseleave="onPointerUp"
+    >
+      <div>
+        <div class="post-header">
+          <div class="pfp"></div>
+          <div class="meta">
+            <span class="username">Anonymous User</span>
+            <span class="timestamp">{{ post.timestamp }}</span>
+          </div>
         </div>
-      </div>
 
-      <div class="post-body">
-        <p>{{ post.content }}</p>
-      </div>
+        <div class="post-body">
+          <p>{{ post.content }}</p>
+        </div>
 
-      <div class="post-actions">
-        <button class="action-btn">
-          <Icon icon="boxicons:like" width="20px" height="20px" />
-        </button>
-        <button class="action-btn">
-          <Icon
-            icon="material-symbols:redo-rounded"
-            width="25px"
-            height="25px"
-          />
-        </button>
+        <div class="post-actions">
+          <button class="action-btn">
+            <Icon icon="boxicons:like" width="20px" height="20px" />
+          </button>
+          <button class="action-btn">
+            <Icon icon="" width="25px" height="25px" />
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* Shared base */
+/* ── Outer Layout Boundary ── */
+.swipe-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: visible; /* Allows the post container to slide out smoothly */
+}
+
+/* ── Swipe-to-reply Icon Positioning ── */
+.reply-hint {
+  position: absolute;
+  /* Placed to the left of the outer boundary, slightly indented */
+  left: 15px;
+  top: 50%;
+  /* Y-axis alignment handled dynamically via :style along with scale */
+  pointer-events: none;
+  z-index: 1;
+  /* Smooth transition for when values update or threshold pops */
+  transition:
+    opacity 0.1s ease-out,
+    transform 0.1s ease-out;
+}
+
+/* Additional styling when threshold triggers */
+.reply-hint--active {
+  filter: drop-shadow(0 0 4px rgba(255, 102, 102, 0.4));
+}
+
+/* ── Post Content Cards ── */
 .post-container {
   position: relative;
-  overflow: visible;
   margin-bottom: 12px;
+  z-index: 2; /* Sits cleanly above the icon background layer */
 }
 
 .post-item,
@@ -162,33 +207,15 @@ const {
   color: #fff;
 }
 
-/* ── Swipe-to-reply (whole component) ── */
-.reply-hint {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  transition:
-    opacity 0.1s,
-    transform 0.15s;
-  z-index: 1;
-}
-
-/* Bounce the icon when threshold is reached */
-.reply-hint--active {
-  transform: translateY(-50%) scale(1.3);
-}
-
 .swipe-content {
   position: relative;
-  background: inherit;
+  /* Snap back with an elastic feel */
   transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
-  touch-action: pan-y;
+  touch-action: pan-y; /* vertical scroll still works smoothly */
   user-select: none;
 }
 
-/* No transition while finger is down — 1:1 tracking */
+/* No transition while finger is actively dragging — 1:1 tracking */
 .swipe-content.is-swiping {
   transition: none;
 }
