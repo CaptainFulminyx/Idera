@@ -140,7 +140,7 @@ const replyIconScale = computed(() => {
 
 /* Default: red accent */
 .post-item {
-  border: 5px solid #f66;
+  border: 8px solid #f66;
   border-top-left-radius: 0px;
 }
 .post-item .post-header {
