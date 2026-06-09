@@ -1,8 +1,5 @@
 <template>
-  <div 
-    class="writeTextContainer" 
-    :style="{ bottom: `${keyboardOffset}px` }"
-  >
+  <div class="writeTextContainer" :style="{ bottom: `${keyboardOffset}px` }">
     <div class="input-bar">
       <textarea
         ref="textareaRef"
@@ -46,13 +43,15 @@ const autoResize = () => {
   textarea.style.height = "auto";
   const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight) || 24;
   const paddingTop = parseFloat(getComputedStyle(textarea).paddingTop) || 0;
-  const paddingBottom = parseFloat(getComputedStyle(textarea).paddingBottom) || 0;
+  const paddingBottom =
+    parseFloat(getComputedStyle(textarea).paddingBottom) || 0;
 
   const maxHeight = lineHeight * 4 + paddingTop + paddingBottom;
 
   let newHeight = Math.min(textarea.scrollHeight, maxHeight);
   textarea.style.height = `${newHeight}px`;
-  textarea.style.overflowY = textarea.scrollHeight > maxHeight ? "auto" : "hidden";
+  textarea.style.overflowY =
+    textarea.scrollHeight > maxHeight ? "auto" : "hidden";
 };
 
 // Handler to update the layout when the virtual viewport changes (i.e. keyboard pops up)
@@ -61,7 +60,7 @@ const handleViewportChange = () => {
 
   // Calculate the hidden space at the bottom of the screen
   const offset = window.innerHeight - window.visualViewport.height;
-  
+
   // Ensure we don't apply negative offsets
   keyboardOffset.value = Math.max(0, offset);
 };
@@ -109,8 +108,8 @@ function postContentFunc() {
   padding: 16px 20px 24px 20px;
   box-sizing: border-box;
   /* Smooth out the transition slightly for moving devices */
-  transition: bottom 0.1s ease-out; 
-  z-index: 1000; 
+  transition: bottom 0.1s ease-out;
+  z-index: 1000;
 }
 
 .input-bar {
