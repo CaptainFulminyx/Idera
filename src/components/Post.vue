@@ -1,45 +1,91 @@
 <script setup>
 import { Icon } from "@iconify/vue";
+import { useSwipeReply } from "@/lib/useSwipe";
 
-defineProps({
+const props = defineProps({
   post: {
     type: Object,
     required: true,
   },
 });
+
+const emit = defineEmits(["reply"]);
+
+const {
+  translateX,
+  isSwiping,
+  replyIconOpacity,
+  reachedThreshold,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+} = useSwipeReply(60, () => emit("reply", props.post));
 </script>
 
 <template>
-  <div :class="post.isMyPost ? 'myPost-item' : 'post-item'">
-    <div class="post-header">
-      <div class="pfp"></div>
-      <div class="meta">
-        <span class="username">Anonymous User</span>
-        <span class="timestamp">{{ post.timestamp }}</span>
+  <div
+    :class="post.isMyPost ? 'myPost-item' : 'post-item'"
+    class="post-container swipe-content"
+    :class="{ 'is-swiping': isSwiping }"
+    :style="{ transform: `translateX(${translateX}px)` }"
+    @touchstart.passive="onPointerDown"
+    @touchmove.passive="onPointerMove"
+    @touchend="onPointerUp"
+    @mousedown="onPointerDown"
+    @mousemove="onPointerMove"
+    @mouseup="onPointerUp"
+    @mouseleave="onPointerUp"
+  >
+    <!-- Reply icon sits behind, revealed by swipe -->
+    <div
+      class="reply-hint"
+      :style="{ opacity: replyIconOpacity }"
+      :class="{ 'reply-hint--active': reachedThreshold }"
+    >
+      <Icon icon="mdi:reply" width="22px" height="22px" color="#f66" />
+    </div>
+
+    <!-- Swipeable entire post -->
+    <div>
+      <div class="post-header">
+        <div class="pfp"></div>
+        <div class="meta">
+          <span class="username">Anonymous User</span>
+          <span class="timestamp">{{ post.timestamp }}</span>
+        </div>
       </div>
-    </div>
 
-    <div class="post-body">
-      <p>{{ post.content }}</p>
-    </div>
+      <div class="post-body">
+        <p>{{ post.content }}</p>
+      </div>
 
-    <div class="post-actions">
-      <button class="action-btn">
-        <Icon icon="boxicons:like" width="20px" height="20px" />
-      </button>
-      <button class="action-btn">
-        <Icon icon="material-symbols:redo-rounded" width="25px" height="25px" />
-      </button>
+      <div class="post-actions">
+        <button class="action-btn">
+          <Icon icon="boxicons:like" width="20px" height="20px" />
+        </button>
+        <button class="action-btn">
+          <Icon
+            icon="material-symbols:redo-rounded"
+            width="25px"
+            height="25px"
+          />
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
 /* Shared base */
+.post-container {
+  position: relative;
+  overflow: visible;
+  margin-bottom: 12px;
+}
+
 .post-item,
 .myPost-item {
   border-radius: 20px;
-  margin-bottom: 12px;
   background: #2c2f3f;
   font-family: sans-serif;
   overflow: hidden;
@@ -112,5 +158,36 @@ defineProps({
 }
 .action-btn:hover {
   color: #fff;
+}
+
+/* ── Swipe-to-reply (whole component) ── */
+.reply-hint {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition:
+    opacity 0.1s,
+    transform 0.15s;
+  z-index: 1;
+}
+
+/* Bounce the icon when threshold is reached */
+.reply-hint--active {
+  transform: translateY(-50%) scale(1.3);
+}
+
+.swipe-content {
+  position: relative;
+  background: inherit;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* No transition while finger is down — 1:1 tracking */
+.swipe-content.is-swiping {
+  transition: none;
 }
 </style>
