@@ -24,9 +24,11 @@ const {
 
 <template>
   <div
-    :class="post.isMyPost ? 'myPost-item' : 'post-item'"
+    :class="[
+      isSwiping ? 'is-swiping' : '',
+      post.isMyPost ? 'myPost-item' : 'post-item',
+    ]"
     class="post-container swipe-content"
-    :class="{ 'is-swiping': isSwiping }"
     :style="{ transform: `translateX(${translateX}px)` }"
     @touchstart.passive="onPointerDown"
     @touchmove.passive="onPointerMove"
