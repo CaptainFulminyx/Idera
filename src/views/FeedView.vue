@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import PostComposer from "$/PostComposer.vue";
-import PostItem from "$/Post.vue"; // Imported the new item component
+import Post from "$/Post.vue"; // Imported the new item component
 import DevPanel from "$/DevPanel.vue";
 
 // State to store all posts
@@ -25,15 +25,41 @@ const handleNewPost = (postText) => {
   // Unshift adds the new post to the top of the feed array
   posts.value.unshift(newPost);
 };
+
+// In the parent's script setup
+const replyingTo = ref(null);
+
+function handleSubmit(content) {
+  const newPost = {
+    id: Date.now(),
+    content,
+    timestamp: "just now",
+    isMyPost: true,
+    replyTo: replyingTo.value ?? null, // attach the replied-to post
+  };
+  posts.value.unshift(newPost);
+  replyingTo.value = null; // clear after posting
+}
 </script>
 
 <template>
   <div class="feed">
-    <PostComposer @submit-post="handleNewPost" />
-    <!--<DevPanel />-->
+    <!-- In your feed/view component -->
+    <PostComposer
+      :replying-to="replyingTo"
+      @submit-post="handleSubmit"
+      @cancel-reply="replyingTo = null"
+    />
+
+    <!-- When a Post emits "reply": -->
 
     <div class="feed-posts">
-      <PostItem v-for="post in posts" :key="post.id" :post="post" />
+      <Post
+        v-for="post in posts"
+        :key="post.id"
+        :post="post"
+        @reply="replyingTo = $event"
+      />
     </div>
   </div>
 </template>

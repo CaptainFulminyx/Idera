@@ -1,44 +1,45 @@
 <template>
   <div class="writeTextContainer" :style="{ bottom: `${keyboardOffset}px` }">
-    <!-- Reply preview bar -->
-    <Transition name="reply-preview">
-      <div v-if="replyingTo" class="reply-preview">
-        <div class="reply-preview__bar"></div>
-        <div class="reply-preview__content">
-          <span class="reply-preview__label">Replying to</span>
-          <span class="reply-preview__text">{{ replyingTo.content }}</span>
+    <div class="input-card">
+      <!-- Reply preview bar -->
+      <Transition name="reply-preview">
+        <div v-if="replyingTo" class="reply-preview">
+          <div class="reply-preview__bar"></div>
+          <div class="reply-preview__content">
+            <span class="reply-preview__label">Replying to</span>
+            <span class="reply-preview__text">{{ replyingTo.content }}</span>
+          </div>
+          <button class="reply-preview__close" @click="$emit('cancel-reply')">
+            <Icon
+              icon="material-symbols:close-rounded"
+              width="18px"
+              height="18px"
+            />
+          </button>
         </div>
-        <button class="reply-preview__close" @click="$emit('cancel-reply')">
-          <Icon
-            icon="material-symbols:close-rounded"
-            width="18px"
-            height="18px"
-          />
-        </button>
-      </div>
-    </Transition>
+      </Transition>
 
-    <div class="input-bar">
-      <textarea
-        ref="textareaRef"
-        v-model="text"
-        class="writeText"
-        placeholder="Write something..."
-        rows="1"
-        @input="autoResize"
-      ></textarea>
-      <div class="icon-wrapper" @click="postContentFunc">
-        <Icon
-          icon="boxicons:send-filled"
-          width="40px"
-          height="40px"
-          color="#f66"
-        />
+      <div class="input-bar">
+        <textarea
+          ref="textareaRef"
+          v-model="text"
+          class="writeText"
+          placeholder="Write something..."
+          rows="1"
+          @input="autoResize"
+        ></textarea>
+        <div class="icon-wrapper" @click="postContentFunc">
+          <Icon
+            icon="boxicons:send-filled"
+            width="40px"
+            height="40px"
+            color="#f66"
+          />
+        </div>
       </div>
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, onMounted, onBeforeUnmount, nextTick, watch } from "vue";
 import { Icon } from "@iconify/vue";
@@ -105,14 +106,40 @@ function postContentFunc() {
 </script>
 
 <style scoped>
+/* Outer container — anchors to bottom, no visual styling */
+.writeTextContainer {
+  width: 100%;
+  position: fixed;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 20px 24px 20px;
+  box-sizing: border-box;
+  transition: bottom 0.1s ease-out;
+  z-index: 1000;
+}
+
+/* Unified card: reply preview + input live inside this */
+.input-card {
+  width: 100%;
+  max-width: 800px;
+  background-color: #2c2f3f;
+  border-radius: 15px;
+  outline: 4px solid #f66;
+  overflow: hidden; /* clips reply-preview to card's rounded corners */
+  display: flex;
+  flex-direction: column;
+}
+
 /* Reply preview strip */
 .reply-preview {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 8px 14px;
-  background: #1a1a1a;
-  border-top: 1px solid #2a2a2a;
+  background: #1e2030; /* slightly darker than card to distinguish */
+  border-bottom: 1px solid #3a3d50;
 }
 
 .reply-preview__bar {
@@ -128,7 +155,7 @@ function postContentFunc() {
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-width: 0; /* allows text-overflow to work */
+  min-width: 0;
 }
 
 .reply-preview__label {
@@ -164,45 +191,28 @@ function postContentFunc() {
   color: #aaa;
 }
 
-/* Slide-in / slide-out transition */
+/* Transition — slides up from bottom edge of card */
 .reply-preview-enter-active,
 .reply-preview-leave-active {
   transition:
     opacity 0.18s ease,
-    transform 0.18s ease;
+    max-height 0.18s ease;
+  max-height: 60px;
+  overflow: hidden;
 }
 .reply-preview-enter-from,
 .reply-preview-leave-to {
   opacity: 0;
-  transform: translateY(6px);
+  max-height: 0;
 }
 
-.writeTextContainer {
-  width: 100%;
-  position: fixed;
-  /* 'bottom' is now controlled dynamically via :style */
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px 20px 24px 20px;
-  box-sizing: border-box;
-  /* Smooth out the transition slightly for moving devices */
-  transition: bottom 0.1s ease-out;
-  z-index: 1000;
-}
-
+/* Input row */
 .input-bar {
-  width: 100%;
-  max-width: 800px;
-  background-color: #2c2f3f;
-  border-radius: 15px;
-  padding: 8px 12px;
-  box-sizing: border-box;
-  outline: 4px solid #f66;
   display: flex;
   align-items: flex-end;
   gap: 8px;
+  padding: 8px 12px;
+  box-sizing: border-box;
 }
 
 .writeText {

@@ -79,7 +79,7 @@ const replyIconScale = computed(() => {
         </div>
 
         <div class="post-body">
-          <!-- Quoted reply context — shown when this post is a reply -->
+          <!-- Quoted reply context -->
           <div v-if="post.replyTo" class="quoted-reply">
             <div class="quoted-reply__bar"></div>
             <div class="quoted-reply__content">
@@ -88,7 +88,7 @@ const replyIconScale = computed(() => {
             </div>
           </div>
 
-          <p>{{ post.content }}</p>
+          <p class="post-text">{{ post.content }}</p>
         </div>
 
         <div class="post-actions">
@@ -96,7 +96,11 @@ const replyIconScale = computed(() => {
             <Icon icon="boxicons:like" width="20px" height="20px" />
           </button>
           <button class="action-btn">
-            <Icon icon="" width="25px" height="25px" />
+            <Icon
+              icon="material-symbols:share-outline-rounded"
+              width="20px"
+              height="20px"
+            />
           </button>
         </div>
       </div>
@@ -105,14 +109,14 @@ const replyIconScale = computed(() => {
 </template>
 
 <style scoped>
-/* Quoted reply block inside a post */
+/* ── Quoted reply block ── */
 .quoted-reply {
   display: flex;
   align-items: stretch;
   gap: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   padding: 8px 10px;
-  background: #1c1c1c;
+  background: rgba(255, 255, 255, 0.05); /* subtle lift from card bg */
   border-radius: 8px;
   overflow: hidden;
 }
@@ -142,44 +146,40 @@ const replyIconScale = computed(() => {
 
 .quoted-reply__text {
   font-size: 13px;
-  color: #888;
+  color: #aaa; /* bumped from #888 — legible on dark bg */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* ── Outer Layout Boundary ── */
+/* ── Outer layout ── */
 .swipe-wrapper {
   position: relative;
   width: 100%;
-  overflow: visible; /* Allows the post container to slide out smoothly */
+  overflow: visible;
 }
 
-/* ── Swipe-to-reply Icon Positioning ── */
+/* ── Reply hint icon ── */
 .reply-hint {
   position: absolute;
-  /* Placed to the left of the outer boundary, slightly indented */
   left: 15px;
   top: 50%;
-  /* Y-axis alignment handled dynamically via :style along with scale */
   pointer-events: none;
   z-index: 1;
-  /* Smooth transition for when values update or threshold pops */
   transition:
     opacity 0.1s ease-out,
     transform 0.1s ease-out;
 }
 
-/* Additional styling when threshold triggers */
 .reply-hint--active {
   filter: drop-shadow(0 0 4px rgba(255, 102, 102, 0.4));
 }
 
-/* ── Post Content Cards ── */
+/* ── Post cards ── */
 .post-container {
   position: relative;
   margin-bottom: 12px;
-  z-index: 2; /* Sits cleanly above the icon background layer */
+  z-index: 2;
 }
 
 .post-item,
@@ -190,24 +190,30 @@ const replyIconScale = computed(() => {
   overflow: hidden;
 }
 
-/* Default: red accent */
 .post-item {
   border: 8px solid #f66;
-  border-top-left-radius: 0px;
+  border-top-left-radius: 0;
 }
 .post-item .post-header {
   background: #f66;
 }
+.post-item .pfp {
+  border-color: #fff;
+}
 
-/* My post: white accent */
+/* Consistent border weight with post-item */
 .myPost-item {
-  border: 5px solid #fff;
+  border: 8px solid #fff;
   border-top-right-radius: 0;
 }
 .myPost-item .post-header {
   background: #fff;
 }
+.myPost-item .pfp {
+  border-color: #f66;
+}
 
+/* ── Header ── */
 .post-header {
   display: flex;
   align-items: center;
@@ -215,37 +221,51 @@ const replyIconScale = computed(() => {
   margin-bottom: 12px;
   padding: 10px;
 }
+
 .pfp {
   width: 40px;
   height: 40px;
-  background-color: #fff;
+  background-color: #2c2f3f;
   border-radius: 50%;
-  border: 2px solid #f66;
+  border: 2px solid;
+  flex-shrink: 0;
 }
+
 .meta {
   display: flex;
   flex-direction: column;
 }
+
 .username {
   font-weight: bold;
-  color: #fff;
+  color: #1a1a2e; /* dark — readable on both red and white header */
 }
+
 .timestamp {
   font-size: 0.8rem;
-  color: #333;
+  color: rgba(0, 0, 0, 0.45); /* dark-tinted — works on colored header */
 }
+
+/* ── Body ── */
 .post-body {
-  color: rgb(255, 255, 255);
+  color: #fff;
   line-height: 1.5;
   white-space: pre-wrap;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding: 0 10px;
 }
+
+.post-text {
+  margin: 0 0 4px;
+}
+
+/* ── Actions ── */
 .post-actions {
   display: flex;
   gap: 16px;
   padding: 10px;
+  margin-top: 4px; /* breathing room between body and action row */
 }
+
 .action-btn {
   background: none;
   border: none;
@@ -254,20 +274,21 @@ const replyIconScale = computed(() => {
   align-items: center;
   gap: 4px;
   color: #64748b;
+  transition: color 0.15s;
 }
+
 .action-btn:hover {
   color: #fff;
 }
 
+/* ── Swipe behavior ── */
 .swipe-content {
   position: relative;
-  /* Snap back with an elastic feel */
   transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
-  touch-action: pan-y; /* vertical scroll still works smoothly */
+  touch-action: pan-y;
   user-select: none;
 }
 
-/* No transition while finger is actively dragging — 1:1 tracking */
 .swipe-content.is-swiping {
   transition: none;
 }
