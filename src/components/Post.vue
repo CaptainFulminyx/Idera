@@ -79,6 +79,15 @@ const replyIconScale = computed(() => {
         </div>
 
         <div class="post-body">
+          <!-- Quoted reply context — shown when this post is a reply -->
+          <div v-if="post.replyTo" class="quoted-reply">
+            <div class="quoted-reply__bar"></div>
+            <div class="quoted-reply__content">
+              <span class="quoted-reply__label">Reply to</span>
+              <span class="quoted-reply__text">{{ post.replyTo.content }}</span>
+            </div>
+          </div>
+
           <p>{{ post.content }}</p>
         </div>
 
@@ -96,6 +105,49 @@ const replyIconScale = computed(() => {
 </template>
 
 <style scoped>
+/* Quoted reply block inside a post */
+.quoted-reply {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  background: #1c1c1c;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.quoted-reply__bar {
+  width: 3px;
+  min-width: 3px;
+  border-radius: 2px;
+  background: #f66;
+  flex-shrink: 0;
+}
+
+.quoted-reply__content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.quoted-reply__label {
+  font-size: 11px;
+  color: #f66;
+  font-weight: 600;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.quoted-reply__text {
+  font-size: 13px;
+  color: #888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ── Outer Layout Boundary ── */
 .swipe-wrapper {
   position: relative;
