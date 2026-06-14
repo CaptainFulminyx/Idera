@@ -114,10 +114,10 @@ const replyIconScale = computed(() => {
   display: flex;
   align-items: stretch;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   padding: 8px 10px;
   background: rgba(255, 255, 255, 0.05); /* subtle lift from card bg */
-  border-radius: 8px;
+  border-radius: 5px;
   overflow: hidden;
 }
 
