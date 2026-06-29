@@ -1,10 +1,11 @@
 <script setup>
 import { ref } from "vue";
-import PostComposer from "$/PostComposer.vue";
-import Post from "$/Post.vue"; // Imported the new item component
-import DevPanel from "$/DevPanel.vue";
+import Post from "$/Post.vue";
+import DevPanel from "$/DevPanel.vue"; // Preserved if needed elsewhere
+import ComposeFab from "$/ComposeFAB.vue";
+import ComposeSheet from "$/PostComposer.vue";
 
-// State to store all posts
+// --- State to store all posts ---
 const posts = ref([
   {
     id: 1,
@@ -13,56 +14,61 @@ const posts = ref([
   },
 ]);
 
-// Handle incoming event from PostComposer
-const handleNewPost = (postText) => {
-  const newPost = {
-    id: Date.now(), // Simple unique ID
-    content: postText,
-    isMyPost: true,
-    timestamp: new Date().toLocaleTimeString(),
-  };
-
-  // Unshift adds the new post to the top of the feed array
-  posts.value.unshift(newPost);
-};
-
-// In the parent's script setup
+// --- Sheet & Reply State ---
+const sheetOpen = ref(false);
 const replyingTo = ref(null);
 
-function handleSubmit(content) {
+// --- Methods ---
+// Triggered when clicking the FAB for a new post
+const openCompose = () => {
+  replyingTo.value = null;
+  sheetOpen.value = true;
+};
+
+// Triggered when a Post emits a "reply" event
+const openReply = (post) => {
+  replyingTo.value = post;
+  sheetOpen.value = true;
+};
+
+// Handles the actual post creation logic
+const handleSubmit = (content) => {
   const newPost = {
-    id: Date.now(),
+    id: Date.now(), // Simple unique ID
     content,
-    timestamp: "just now",
+    timestamp: new Date().toLocaleTimeString(), // Unified timestamp approach
     isMyPost: true,
-    replyTo: replyingTo.value ?? null, // attach the replied-to post
+    replyTo: replyingTo.value ?? null, // Attach the replied-to post if it exists
   };
+
+  // Add the new post to the top of the feed array
   posts.value.unshift(newPost);
-  replyingTo.value = null; // clear after posting
-}
+
+  // Close the sheet (which automatically resets replyingTo via watchers/events)
+  sheetOpen.value = false;
+};
 </script>
 
 <template>
   <div class="page-layout">
     <div class="feed">
-      <!-- In your feed/view component -->
-      <PostComposer
-        :replying-to="replyingTo"
-        @submit-post="handleSubmit"
-        @cancel-reply="replyingTo = null"
-      />
-
-      <!-- When a Post emits "reply": -->
-
       <div class="feed-posts">
         <Post
           v-for="post in posts"
           :key="post.id"
           :post="post"
-          @reply="replyingTo = $event"
+          @reply="openReply"
         />
       </div>
     </div>
+
+    <ComposeFab :open="sheetOpen" @click="openCompose" />
+
+    <ComposeSheet
+      v-model="sheetOpen"
+      :replying-to="replyingTo"
+      @submit-post="handleSubmit"
+    />
   </div>
 </template>
 
@@ -75,5 +81,18 @@ function handleSubmit(content) {
 }
 .feed-posts {
   margin-top: 20px;
+}
+
+.page-layout {
+  height: 100dvh; /* dvh = dynamic viewport height, shrinks when keyboard opens */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.feed {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 </style>

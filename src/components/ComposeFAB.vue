@@ -54,11 +54,6 @@ defineEmits(["click"]);
   display: flex;
   align-items: center;
   justify-content: center;
-
-  box-shadow:
-    0 4px 12px rgba(255, 102, 102, 0.45),
-    0 1px 3px rgba(0, 0, 0, 0.3);
-
   transition:
     transform 0.15s ease,
     box-shadow 0.15s ease;
