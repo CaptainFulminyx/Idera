@@ -4,7 +4,7 @@ import Auth from "./components/AuthModal.vue";
 import NavBar from "./components/NavBar.vue";
 </script>
 <template>
-  <div class="drawer-end lg:drawer-open">
+  <div class="drawer lg:drawer-open">
     <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
 
     <div class="drawer-content">
