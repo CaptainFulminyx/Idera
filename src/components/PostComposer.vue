@@ -1,13 +1,59 @@
+<script setup>
+import { ref, computed, nextTick, watch } from "vue";
+import { Icon } from "@iconify/vue";
+
+defineOptions({ name: "SmartInputBar" });
+
+const props = defineProps({
+  replyingTo: { type: Object, default: null },
+});
+
+const emit = defineEmits(["submit-post", "cancel-reply"]);
+const text = ref("");
+const textareaRef = ref(null);
+
+const truncated = computed(() => {
+  const c = props.replyingTo?.content ?? "";
+  return c.length > 60 ? c.slice(0, 60) + "…" : c;
+});
+
+const autoResize = () => {
+  const textarea = textareaRef.value;
+  if (!textarea) return;
+  textarea.style.height = "0px";
+  const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight) || 24;
+  const pt = parseFloat(getComputedStyle(textarea).paddingTop) || 0;
+  const pb = parseFloat(getComputedStyle(textarea).paddingBottom) || 0;
+  const maxHeight = lineHeight * 4 + pt + pb;
+  textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
+  textarea.style.overflowY =
+    textarea.scrollHeight > maxHeight ? "auto" : "hidden";
+};
+
+const onLeave = (el) => {
+  el.style.maxHeight = el.scrollHeight + "px";
+};
+
+watch(text, () => nextTick(autoResize));
+
+function postContentFunc() {
+  if (!text.value.trim()) return;
+  emit("submit-post", text.value);
+  text.value = "";
+  nextTick(autoResize);
+}
+</script>
+
 <template>
-  <div class="writeTextContainer" :style="{ bottom: `${keyboardOffset}px` }">
+  <!-- No more fixed positioning or bottom offset — lives in normal flow -->
+  <div class="writeTextContainer">
     <div class="input-card">
-      <!-- Reply preview bar -->
-      <Transition name="reply-preview">
+      <Transition name="reply-preview" @leave="onLeave">
         <div v-if="replyingTo" class="reply-preview">
           <div class="reply-preview__bar"></div>
           <div class="reply-preview__content">
             <span class="reply-preview__label">Replying to</span>
-            <span class="reply-preview__text">{{ replyingTo.content }}</span>
+            <span class="reply-preview__text">{{ truncated }}</span>
           </div>
           <button class="reply-preview__close" @click="$emit('cancel-reply')">
             <Icon
@@ -26,7 +72,6 @@
           class="writeText"
           placeholder="Write something..."
           rows="1"
-          @input="autoResize"
         ></textarea>
         <div class="icon-wrapper" @click="postContentFunc">
           <Icon
@@ -40,112 +85,68 @@
     </div>
   </div>
 </template>
-<script setup>
-import { ref, onMounted, onBeforeUnmount, nextTick, watch } from "vue";
-import { Icon } from "@iconify/vue";
-
-defineOptions({ name: "SmartInputBar" });
-
-const props = defineProps({
-  replyingTo: {
-    type: Object,
-    default: null,
-  },
-});
-
-const emit = defineEmits(["submit-post", "cancel-reply"]);
-const text = ref("");
-const textareaRef = ref(null);
-const keyboardOffset = ref(0);
-
-const autoResize = () => {
-  const textarea = textareaRef.value;
-  if (!textarea) return;
-  textarea.style.height = "auto";
-  const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight) || 24;
-  const paddingTop = parseFloat(getComputedStyle(textarea).paddingTop) || 0;
-  const paddingBottom =
-    parseFloat(getComputedStyle(textarea).paddingBottom) || 0;
-  const maxHeight = lineHeight * 4 + paddingTop + paddingBottom;
-  let newHeight = Math.min(textarea.scrollHeight, maxHeight);
-  textarea.style.height = `${newHeight}px`;
-  textarea.style.overflowY =
-    textarea.scrollHeight > maxHeight ? "auto" : "hidden";
-};
-
-const handleViewportChange = () => {
-  if (!window.visualViewport) return;
-  const offset = window.innerHeight - window.visualViewport.height;
-  keyboardOffset.value = Math.max(0, offset);
-};
-
-watch(text, () => nextTick(autoResize));
-
-onMounted(() => {
-  autoResize();
-  window.addEventListener("resize", autoResize);
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", handleViewportChange);
-    window.visualViewport.addEventListener("scroll", handleViewportChange);
-  }
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener("resize", autoResize);
-  if (window.visualViewport) {
-    window.visualViewport.removeEventListener("resize", handleViewportChange);
-    window.visualViewport.removeEventListener("scroll", handleViewportChange);
-  }
-});
-
-function postContentFunc() {
-  if (!text.value.trim()) return;
-  emit("submit-post", text.value);
-  text.value = "";
-}
-</script>
 
 <style scoped>
-/* Outer container — anchors to bottom, no visual styling */
+/*
+  The container is NOT fixed. The parent page layout must be:
+
+    html, body { height: 100%; margin: 0; }
+
+    .page-layout {
+      height: 100%;           or 100dvh
+      display: flex;
+      flex-direction: column;
+    }
+
+    .feed-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    <SmartInputBar /> sits AFTER the scroll area as the last child.
+
+  The browser then pushes this bar up when the keyboard opens — no JS needed.
+  On iOS Safari use height: 100dvh on .page-layout for correct visual viewport height.
+*/
+
 .writeTextContainer {
   width: 100%;
-  position: fixed;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px 20px 24px 20px;
+  flex-shrink: 0; /* Never squish — always full height in the flex column */
+  padding: 12px 20px 16px;
   box-sizing: border-box;
-  transition: bottom 0.1s ease-out;
-  z-index: 1000;
+  /* Safe area inset for iPhone home bar */
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 
-/* Unified card: reply preview + input live inside this */
 .input-card {
   width: 100%;
   max-width: 800px;
+  margin: 0 auto;
   background-color: #2c2f3f;
   border-radius: 15px;
-  outline: 4px solid #f66;
-  overflow: hidden; /* clips reply-preview to card's rounded corners */
+  box-shadow: 0 0 0 4px #f66;
+  box-sizing: border-box;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-/* Reply preview strip */
+/* ── Reply preview ── */
 .reply-preview {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 14px;
-  background: #1e2030; /* slightly darker than card to distinguish */
+  padding: 10px 14px;
+  background: #1e2030;
   border-bottom: 1px solid #3a3d50;
+  box-sizing: border-box;
+  height: 54px;
 }
 
 .reply-preview__bar {
   width: 3px;
   min-width: 3px;
-  height: 36px;
+  height: 32px;
   border-radius: 2px;
   background: #f66;
   flex-shrink: 0;
@@ -191,45 +192,50 @@ function postContentFunc() {
   color: #aaa;
 }
 
-/* Transition — slides up from bottom edge of card */
 .reply-preview-enter-active,
 .reply-preview-leave-active {
   transition:
-    opacity 0.18s ease,
-    max-height 0.18s ease;
-  max-height: 60px;
+    transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity 0.15s ease,
+    max-height 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  max-height: 54px;
   overflow: hidden;
 }
+
 .reply-preview-enter-from,
 .reply-preview-leave-to {
   opacity: 0;
-  max-height: 0;
+  max-height: 0 !important;
+  transform: translateY(-10px);
 }
 
-/* Input row */
+/* ── Input row ── */
 .input-bar {
   display: flex;
   align-items: flex-end;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 10px 12px;
   box-sizing: border-box;
+  background-color: #2c2f3f;
 }
 
 .writeText {
   flex: 1;
+  min-width: 0;
   background: transparent;
   border: none;
   outline: none;
   resize: none;
   color: #f0f3fa;
   font-family: inherit;
-  font-size: 1rem;
+  font-size: 16px; /* Prevents iOS auto-zoom on focus */
   line-height: 1.5;
-  padding: 8px 4px;
+  padding: 6px 4px;
   margin: 0;
   box-sizing: border-box;
   word-break: break-word;
   white-space: pre-wrap;
+  -webkit-overflow-scrolling: touch;
 }
 
 .icon-wrapper {
@@ -243,12 +249,8 @@ function postContentFunc() {
 
 @media (max-width: 640px) {
   .writeTextContainer {
-    padding-left: 16px;
-    padding-right: 16px;
-    padding-bottom: 20px;
-  }
-  .writeText {
-    font-size: 0.95rem;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }
 </style>

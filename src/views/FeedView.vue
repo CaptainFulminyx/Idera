@@ -43,23 +43,25 @@ function handleSubmit(content) {
 </script>
 
 <template>
-  <div class="feed">
-    <!-- In your feed/view component -->
-    <PostComposer
-      :replying-to="replyingTo"
-      @submit-post="handleSubmit"
-      @cancel-reply="replyingTo = null"
-    />
-
-    <!-- When a Post emits "reply": -->
-
-    <div class="feed-posts">
-      <Post
-        v-for="post in posts"
-        :key="post.id"
-        :post="post"
-        @reply="replyingTo = $event"
+  <div class="page-layout">
+    <div class="feed">
+      <!-- In your feed/view component -->
+      <PostComposer
+        :replying-to="replyingTo"
+        @submit-post="handleSubmit"
+        @cancel-reply="replyingTo = null"
       />
+
+      <!-- When a Post emits "reply": -->
+
+      <div class="feed-posts">
+        <Post
+          v-for="post in posts"
+          :key="post.id"
+          :post="post"
+          @reply="replyingTo = $event"
+        />
+      </div>
     </div>
   </div>
 </template>
