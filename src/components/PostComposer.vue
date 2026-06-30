@@ -79,7 +79,7 @@ watch(
 .sheet-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: 800;
   background: #1e2030;
   display: flex;
   flex-direction: column;
