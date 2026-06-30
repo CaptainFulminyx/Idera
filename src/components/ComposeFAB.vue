@@ -18,16 +18,8 @@ defineEmits(["click"]);
   >
     <Transition name="fab-icon" mode="out-in">
       <Icon
-        v-if="!open"
         key="plus"
         icon="material-symbols:add-rounded"
-        width="28px"
-        height="28px"
-      />
-      <Icon
-        v-else
-        key="close"
-        icon="material-symbols:close-rounded"
         width="28px"
         height="28px"
       />

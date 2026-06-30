@@ -59,7 +59,9 @@ watch(
           <div class="reply-context__bar"></div>
           <div class="reply-context__body">
             <span class="reply-context__label">Replying to</span>
-            <span class="reply-context__text">{{ replyingTo.content }}</span>
+            <span class="reply-context__text">{{
+              replyingTo.content.slice(0, 20).concat("...")
+            }}</span>
           </div>
         </div>
 
@@ -79,7 +81,7 @@ watch(
 .sheet-overlay {
   position: fixed;
   inset: 0;
-  z-index: 800;
+  z-index: 1000;
   background: #1e2030;
   display: flex;
   flex-direction: column;
