@@ -58,16 +58,20 @@ const replyIconScale = computed(() => {
       :class="[
         isSwiping ? 'is-swiping' : '',
         post.isMyPost ? 'myPost-item' : 'post-item',
+        isSwiping ? 'no-transition' : '',
+        isAnimatingBack ? 'snap-back' : '',
       ]"
       class="post-container swipe-content"
-      :style="{ transform: `translateX(${translateX}px)` }"
-      @touchstart.passive="onPointerDown"
-      @touchmove.passive="onPointerMove"
+      style="touch-action: pan-y"
+      @touchstart="onPointerDown"
+      @touchmove="onPointerMove"
       @touchend="onPointerUp"
+      @touchcancel="onPointerCancel"
       @mousedown="onPointerDown"
       @mousemove="onPointerMove"
       @mouseup="onPointerUp"
-      @mouseleave="onPointerUp"
+      @mouseleave="onPointerCancel"
+      :style="{ transform: `translateX(${translateX}px)` }"
     >
       <div>
         <div class="post-header">
@@ -195,12 +199,16 @@ const replyIconScale = computed(() => {
 .post-item {
   border: 8px solid #f66;
   border-top-left-radius: 0;
+  transition: transform 0.2s ease-out;
 }
 .post-item .post-header {
   background: #f66;
 }
 .post-item .pfp {
   border-color: #fff;
+}
+.post-item.no-transition {
+  transition: none;
 }
 
 /* Consistent border weight with post-item */

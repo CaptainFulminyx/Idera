@@ -2,6 +2,7 @@
 import { onMounted, provide, ref } from "vue";
 import Auth from "./components/AuthModal.vue";
 import NavBar from "./components/NavBar.vue";
+import { Icon } from "@iconify/vue";
 </script>
 <template>
   <div class="drawer lg:drawer-open">
@@ -31,7 +32,11 @@ import NavBar from "./components/NavBar.vue";
               data-tip="Homepage"
             >
               <!-- Home icon -->
-
+              <Icon
+                icon="material-symbols:home-rounded"
+                width="30px"
+                height="30px"
+              />
               <span class="is-drawer-close:hidden">Homepage</span>
             </button>
           </li>
@@ -43,7 +48,11 @@ import NavBar from "./components/NavBar.vue";
               data-tip="Settings"
             >
               <!-- Settings icon -->
-
+              <Icon
+                icon="material-symbols:settings-rounded"
+                width="30px"
+                height="30px"
+              />
               <span class="is-drawer-close:hidden">Settings</span>
             </button>
           </li>
