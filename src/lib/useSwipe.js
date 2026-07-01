@@ -96,7 +96,7 @@ export function useSwipeReply(threshold = 80, onReply) {
   }
 
   function onPointerCancel() {
-    // Interrupted gesture (OS dialog, notification, etc) — reset, don't trigger reply
+    
     endSwipe(false)
   }
 
