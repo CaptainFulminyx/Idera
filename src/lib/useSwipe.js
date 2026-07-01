@@ -70,7 +70,7 @@ export function useSwipeReply(threshold = 80, onReply) {
       translateX.value = Math.min(threshold + stretching, MAX_STRETCH)
     }
 
-    // Fire haptic once, exactly at the moment threshold is crossed
+    
     if (reachedThreshold.value && !wasAtThreshold && navigator.vibrate) {
       navigator.vibrate(10)
     }
