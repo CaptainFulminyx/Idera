@@ -81,7 +81,7 @@ watch(
 .sheet-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: 1500;
   background: #1e2030;
   display: flex;
   flex-direction: column;
@@ -93,7 +93,7 @@ watch(
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid #2c2f3f;
+  border-bottom: 2px solid #f66;
   flex-shrink: 0;
 }
 
@@ -137,8 +137,10 @@ watch(
   align-items: flex-start;
   gap: 12px;
   padding: 14px 20px;
-  border-bottom: 1px solid #2c2f3f;
+  border: 2px solid #f66;
+  border-radius: 10px;
   flex-shrink: 0;
+  margin: 10px;
 }
 
 .reply-context__bar {
