@@ -89,7 +89,7 @@ const replyIconScale = computed(() => {
             <div class="quoted-reply__content">
               <span class="quoted-reply__label">Reply to</span>
               <span class="quoted-reply__text">{{
-                post.replyTo.content.slice(0, 30).concat("...")
+                post.replyTo.content.slice(0, 40).concat("...")
               }}</span>
             </div>
           </div>
