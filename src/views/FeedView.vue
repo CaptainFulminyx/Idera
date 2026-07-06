@@ -41,6 +41,11 @@ const handleSubmit = (content) => {
     replyTo: replyingTo.value ?? null, // Attach the replied-to post if it exists
   };
 
+  const handleCancelReply = () => {
+    replyingTo.value = null;
+    sheetOpen.value = true;
+  };
+
   // Add the new post to the top of the feed array
   posts.value.unshift(newPost);
 
@@ -68,6 +73,7 @@ const handleSubmit = (content) => {
       v-model="sheetOpen"
       :replying-to="replyingTo"
       @submit-post="handleSubmit"
+      @cancel-reply="handleCancelReply"
     />
   </div>
 </template>

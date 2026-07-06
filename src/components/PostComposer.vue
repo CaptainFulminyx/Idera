@@ -5,11 +5,11 @@ import { Icon } from "@iconify/vue";
 defineOptions({ name: "ComposeSheet" });
 
 const props = defineProps({
-  modelValue: { type: Boolean, default: false }, // open/close
+  modelValue: { type: Boolean, default: false },
   replyingTo: { type: Object, default: null },
 });
 
-const emit = defineEmits(["update:modelValue", "submit-post"]);
+const emit = defineEmits(["update:modelValue", "submit-post", "cancel-reply"]);
 
 const text = ref("");
 const textareaRef = ref(null);
@@ -25,14 +25,16 @@ const submit = () => {
   close();
 };
 
-// Focus textarea when sheet opens, clear when it closes
+const cancelReply = () => {
+  emit("cancel-reply"); // Emit event to parent to clear reply
+};
+
+// Focus textarea when sheet opens
 watch(
   () => props.modelValue,
   (open) => {
     if (open) {
       nextTick(() => textareaRef.value?.focus());
-    } else {
-      text.value = "";
     }
   },
 );
@@ -62,6 +64,7 @@ watch(
             <span class="reply-context__text">{{
               replyingTo.content.slice(0, 40).concat("...")
             }}</span>
+            <button class="cancel-reply" @click="cancelReply">✕</button>
           </div>
         </div>
 
